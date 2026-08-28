@@ -48,8 +48,8 @@ export default async function OutreachSettingsPage() {
           </div>
 
           {budget.warmingUp && (
-            <div className="flex items-start gap-3 rounded-md border border-amber-500/40 bg-amber-500/5 p-3">
-              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+            <div className="flex items-start gap-3 rounded-md border border-primary/40 bg-primary/5 p-3">
+              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <div className="space-y-1">
                 <p className="text-sm font-medium">Warming up</p>
                 <p className="text-xs text-muted-foreground">

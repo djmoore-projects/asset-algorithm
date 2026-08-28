@@ -10,10 +10,10 @@ import { useSearchParams } from "next/navigation";
 
 const INTEGRATIONS = [
   { id: "anthropic", icon: Brain, name: "Claude AI", description: "Anthropic API for AI-powered analysis and generation", envKey: "ANTHROPIC_API_KEY", color: "text-primary", oauth: false },
-  { id: "resend", icon: Mail, name: "Resend", description: "Transactional email for outreach campaigns", envKey: "RESEND_API_KEY", color: "text-blue-500", oauth: false },
+  { id: "resend", icon: Mail, name: "Resend", description: "Transactional email for outreach campaigns", envKey: "RESEND_API_KEY", color: "text-primary", oauth: false },
   { id: "twilio", icon: Phone, name: "Twilio", description: "Voice calls and SMS messaging", envKey: "TWILIO_ACCOUNT_SID", color: "text-red-500", oauth: false },
   { id: "google_calendar", icon: Calendar, name: "Google Calendar", description: "Auto-book meetings from positive outreach replies", envKey: "GOOGLE_CLIENT_ID", color: "text-green-500", oauth: true },
-  { id: "linkedin", icon: Linkedin, name: "LinkedIn", description: "Connection requests and DM automation", envKey: "LINKEDIN_ACCESS_TOKEN", color: "text-blue-600", oauth: false },
+  { id: "linkedin", icon: Linkedin, name: "LinkedIn", description: "Connection requests and DM automation", envKey: "LINKEDIN_ACCESS_TOKEN", color: "text-primary", oauth: false },
 ];
 
 export default function IntegrationsPage() {

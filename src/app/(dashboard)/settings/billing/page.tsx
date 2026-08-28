@@ -133,7 +133,7 @@ export default function BillingPage() {
             </div>
           )}
           {subscription?.cancel_at_period_end && (
-            <p className="text-xs text-yellow-500">Your subscription will cancel at the end of the current period.</p>
+            <p className="text-xs text-primary">Your subscription will cancel at the end of the current period.</p>
           )}
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Monthly price</span>
@@ -212,7 +212,7 @@ function UsageRow({ icon, label, used, limit }: { icon: React.ReactNode; label: 
       </div>
       <Progress value={isUnlimited ? 0 : percent} className="h-2" />
       {!isUnlimited && percent >= 80 && (
-        <p className="text-xs text-yellow-500">{percent}% used</p>
+        <p className="text-xs text-primary">{percent}% used</p>
       )}
     </div>
   );

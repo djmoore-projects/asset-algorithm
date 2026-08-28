@@ -15,9 +15,9 @@ export default async function CompanyDetailPage({ params }: { params: Promise<{ 
   const deals = await getDeals({ company_id: companyId });
 
   const STATUS_COLORS: Record<string, string> = {
-    new: "bg-blue-500/10 text-blue-500", researching: "bg-yellow-500/10 text-yellow-500",
-    qualified: "bg-green-500/10 text-green-500", outreach: "bg-purple-500/10 text-purple-500",
-    engaged: "bg-orange-500/10 text-orange-500", not_a_fit: "bg-muted text-muted-foreground",
+    new: "bg-primary/10 text-primary", researching: "bg-primary/10 text-primary",
+    qualified: "bg-green-500/10 text-green-500", outreach: "bg-primary/10 text-primary",
+    engaged: "bg-primary/10 text-primary", not_a_fit: "bg-muted text-muted-foreground",
   };
 
   return (

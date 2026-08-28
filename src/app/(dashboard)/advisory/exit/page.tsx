@@ -81,8 +81,8 @@ export default function ExitPage() {
         <div className="space-y-6">
           <div className="grid grid-cols-3 gap-4">
             <Card className="border-border/50"><CardContent className="p-4 text-center"><DollarSign className="mx-auto h-5 w-5 text-green-500" /><p className="mt-1 text-lg font-bold">${(projectedExitValue / 1e6).toFixed(1)}M</p><p className="text-xs text-muted-foreground">Est. Exit Value</p></CardContent></Card>
-            <Card className="border-border/50"><CardContent className="p-4 text-center"><TrendingUp className="mx-auto h-5 w-5 text-blue-500" /><p className="mt-1 text-lg font-bold">{moic.toFixed(1)}x</p><p className="text-xs text-muted-foreground">MOIC</p></CardContent></Card>
-            <Card className="border-border/50"><CardContent className="p-4 text-center"><Calendar className="mx-auto h-5 w-5 text-purple-500" /><p className="mt-1 text-lg font-bold">{inputs.hold_period}yr</p><p className="text-xs text-muted-foreground">Hold Period</p></CardContent></Card>
+            <Card className="border-border/50"><CardContent className="p-4 text-center"><TrendingUp className="mx-auto h-5 w-5 text-primary" /><p className="mt-1 text-lg font-bold">{moic.toFixed(1)}x</p><p className="text-xs text-muted-foreground">MOIC</p></CardContent></Card>
+            <Card className="border-border/50"><CardContent className="p-4 text-center"><Calendar className="mx-auto h-5 w-5 text-primary" /><p className="mt-1 text-lg font-bold">{inputs.hold_period}yr</p><p className="text-xs text-muted-foreground">Hold Period</p></CardContent></Card>
           </div>
           {result && (<Card className="border-primary/20"><CardHeader><CardTitle className="flex items-center gap-2 text-sm"><Sparkles className="h-4 w-4 text-primary" />AI Exit Analysis</CardTitle></CardHeader><CardContent><div className="whitespace-pre-wrap text-sm text-muted-foreground">{typeof result.analysis === "string" ? result.analysis : JSON.stringify(result, null, 2)}</div></CardContent></Card>)}
         </div>

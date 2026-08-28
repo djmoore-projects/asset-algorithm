@@ -1,14 +1,16 @@
 import type { DealStage } from "@/types/database";
 
+// Cold to hot. Grey early, yellow as the deal heats up, so the colour itself
+// says how far along a card is. Closed and dead stay semantic.
 export const DEAL_STAGES: { value: DealStage; label: string; color: string }[] = [
-  { value: "lead", label: "Lead", color: "bg-slate-500" },
-  { value: "initial_contact", label: "Initial Contact", color: "bg-blue-500" },
-  { value: "nda_signed", label: "NDA Signed", color: "bg-indigo-500" },
-  { value: "info_received", label: "Info Received", color: "bg-violet-500" },
-  { value: "loi_submitted", label: "LOI Submitted", color: "bg-purple-500" },
-  { value: "loi_accepted", label: "LOI Accepted", color: "bg-fuchsia-500" },
-  { value: "diligence", label: "Diligence", color: "bg-amber-500" },
-  { value: "closing", label: "Closing", color: "bg-orange-500" },
+  { value: "lead", label: "Lead", color: "bg-muted-foreground/30" },
+  { value: "initial_contact", label: "Initial Contact", color: "bg-muted-foreground/50" },
+  { value: "nda_signed", label: "NDA Signed", color: "bg-muted-foreground/70" },
+  { value: "info_received", label: "Info Received", color: "bg-primary/35" },
+  { value: "loi_submitted", label: "LOI Submitted", color: "bg-primary/55" },
+  { value: "loi_accepted", label: "LOI Accepted", color: "bg-primary/75" },
+  { value: "diligence", label: "Diligence", color: "bg-primary/90" },
+  { value: "closing", label: "Closing", color: "bg-primary" },
   { value: "closed", label: "Closed", color: "bg-emerald-500" },
   { value: "dead", label: "Dead", color: "bg-red-500" },
 ];
@@ -18,10 +20,10 @@ export const PIPELINE_STAGES = DEAL_STAGES.filter(
 );
 
 export const PRIORITY_CONFIG = {
-  low: { label: "Low", color: "bg-slate-100 text-slate-700" },
-  medium: { label: "Medium", color: "bg-blue-100 text-blue-700" },
-  high: { label: "High", color: "bg-amber-100 text-amber-700" },
-  critical: { label: "Critical", color: "bg-red-100 text-red-700" },
+  low: { label: "Low", color: "bg-muted text-muted-foreground" },
+  medium: { label: "Medium", color: "bg-primary/15 text-primary" },
+  high: { label: "High", color: "bg-primary/30 text-primary" },
+  critical: { label: "Critical", color: "bg-destructive/15 text-destructive" },
 } as const;
 
 export const CHANNEL_CONFIG = {

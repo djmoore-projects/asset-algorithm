@@ -116,19 +116,19 @@ export default async function DashboardPage() {
           title="Active Deals"
           value={activeDeals}
           icon="Kanban"
-          iconColor="text-blue-500"
+          iconColor="text-primary"
         />
         <MetricCard
           title="Companies Sourced"
           value={totalCompanies}
           icon="Building2"
-          iconColor="text-violet-500"
+          iconColor="text-primary"
         />
         <MetricCard
           title="Contacts"
           value={totalContacts}
           icon="Users"
-          iconColor="text-amber-500"
+          iconColor="text-primary"
         />
       </div>
 
@@ -195,10 +195,10 @@ export default async function DashboardPage() {
         {/* Right Column */}
         <div className="space-y-6">
           {/* AI Insights Card */}
-          <Card className="border-border/50 bg-gradient-to-br from-violet-500/5 to-blue-500/5">
+          <Card className="border-border/50 bg-gradient-to-br from-primary/5 to-primary/5">
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-                <Sparkles className="h-4 w-4 text-violet-500" />
+                <Sparkles className="h-4 w-4 text-primary" />
                 AI Insights
               </CardTitle>
             </CardHeader>

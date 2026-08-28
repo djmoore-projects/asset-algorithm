@@ -82,7 +82,7 @@ export default function FinancingPage() {
         </div>
         <div className="space-y-6">
           <Card className="border-border/50"><CardHeader><CardTitle className="text-sm">Capital Stack Preview</CardTitle></CardHeader><CardContent className="space-y-3">
-            {[{ label: "Equity / Down Payment", amount: dp, color: "bg-green-500", pct: inputs.down_payment_pct }, { label: "SBA 7(a) Loan", amount: sba, color: "bg-blue-500", pct: inputs.sba_loan_pct }, { label: "Seller Note", amount: seller, color: "bg-yellow-500", pct: inputs.seller_note_pct }].map((item) => (
+            {[{ label: "Equity / Down Payment", amount: dp, color: "bg-green-500", pct: inputs.down_payment_pct }, { label: "SBA 7(a) Loan", amount: sba, color: "bg-primary", pct: inputs.sba_loan_pct }, { label: "Seller Note", amount: seller, color: "bg-primary", pct: inputs.seller_note_pct }].map((item) => (
               <div key={item.label}><div className="flex items-center justify-between text-sm"><span>{item.label}</span><span className="font-medium">${item.amount.toLocaleString()}</span></div><div className="mt-1 h-2 overflow-hidden rounded-full bg-muted"><div className={`h-full rounded-full ${item.color}`} style={{ width: `${item.pct}%` }} /></div></div>
             ))}
             <div className="border-t pt-2"><div className="flex items-center justify-between text-sm font-medium"><span>Total</span><span>${pp.toLocaleString()}</span></div>{parseFloat(inputs.ebitda) > 0 && <p className="text-xs text-muted-foreground">{(pp / parseFloat(inputs.ebitda)).toFixed(1)}x EBITDA Multiple</p>}</div>

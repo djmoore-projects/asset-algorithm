@@ -95,7 +95,7 @@ export default async function DealDetailPage({
               </Badge>
               {deal.deal_score !== null && (
                 <div className="flex items-center gap-1">
-                  <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                  <Sparkles className="h-3.5 w-3.5 text-primary" />
                   <span className="text-sm font-medium">
                     Score: {Math.round(deal.deal_score)}
                   </span>
@@ -359,7 +359,7 @@ export default async function DealDetailPage({
                         className={
                           analysis.status === "completed"
                             ? "text-emerald-500"
-                            : "text-amber-500"
+                            : "text-primary"
                         }
                       >
                         {analysis.status}

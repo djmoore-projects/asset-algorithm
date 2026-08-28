@@ -242,7 +242,7 @@ export default function ScanDetailPage() {
                   <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
                     {bd.formatted_address && <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{bd.formatted_address}</span>}
                     {(cd.phone || bd.phone) && <span className="flex items-center gap-1"><Phone className="h-3 w-3" />{cd.phone || bd.phone}</span>}
-                    {bd.rating && <span className="flex items-center gap-1"><Star className="h-3 w-3 fill-amber-400 text-amber-400" />{bd.rating}</span>}
+                    {bd.rating && <span className="flex items-center gap-1"><Star className="h-3 w-3 fill-primary/30 text-primary" />{bd.rating}</span>}
                     {bd.website && <a href={bd.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline"><Globe className="h-3 w-3" />Website</a>}
                     {bd.google_maps_url && <a href={bd.google_maps_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary hover:underline"><ExternalLink className="h-3 w-3" />Maps</a>}
                   </div>
@@ -260,7 +260,7 @@ export default function ScanDetailPage() {
                       {cd.email && <Badge variant="outline" className="text-[10px]">{cd.email}</Badge>}
                       {cd.linkedin_url && (
                         <a href={cd.linkedin_url} target="_blank" rel="noopener noreferrer">
-                          <Badge variant="outline" className="text-[10px] text-blue-400 border-blue-400/50 hover:bg-blue-400/10">LinkedIn</Badge>
+                          <Badge variant="outline" className="text-[10px] text-primary border-primary/50 hover:bg-primary/10">LinkedIn</Badge>
                         </a>
                       )}
                       {enrichSources.includes("website") && (
@@ -269,17 +269,17 @@ export default function ScanDetailPage() {
                         </Badge>
                       )}
                       {(enrichSources.includes("public_records") || hasPublicRecords) && (
-                        <Badge variant="outline" className="text-[10px] text-blue-500 border-blue-500/30">
+                        <Badge variant="outline" className="text-[10px] text-primary border-primary/30">
                           <FileText className="mr-0.5 h-2.5 w-2.5" />Public Records
                         </Badge>
                       )}
                       {enrichSources.includes("google_search") && (
-                        <Badge variant="outline" className="text-[10px] text-orange-500 border-orange-500/30">
+                        <Badge variant="outline" className="text-[10px] text-primary border-primary/30">
                           Google Search
                         </Badge>
                       )}
                       {cd.confidence && (
-                        <Badge variant="outline" className={`text-[10px] ${cd.confidence === "high" ? "text-emerald-500 border-emerald-500/30" : cd.confidence === "medium" ? "text-amber-500 border-amber-500/30" : "text-muted-foreground"}`}>
+                        <Badge variant="outline" className={`text-[10px] ${cd.confidence === "high" ? "text-emerald-500 border-emerald-500/30" : cd.confidence === "medium" ? "text-primary border-primary/30" : "text-muted-foreground"}`}>
                           {cd.confidence} confidence
                         </Badge>
                       )}
@@ -295,7 +295,7 @@ export default function ScanDetailPage() {
                           {o.position}: {o.name}
                         </Badge>
                       ))}
-                      <Badge variant="outline" className="text-[10px] text-blue-500 border-blue-500/30">Public Records</Badge>
+                      <Badge variant="outline" className="text-[10px] text-primary border-primary/30">Public Records</Badge>
                     </div>
                   )}
 

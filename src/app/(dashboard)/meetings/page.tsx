@@ -6,7 +6,7 @@ import Link from "next/link";
 import { format, isPast, isToday } from "date-fns";
 
 const STATUS_COLORS: Record<string, string> = {
-  scheduled: "bg-blue-500/10 text-blue-500",
+  scheduled: "bg-primary/10 text-primary",
   confirmed: "bg-green-500/10 text-green-500",
   completed: "bg-muted text-muted-foreground",
   cancelled: "bg-red-500/10 text-red-500",

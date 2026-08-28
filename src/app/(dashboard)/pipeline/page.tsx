@@ -91,9 +91,9 @@ function DealCard({
   };
 
   const priorityColors: Record<string, string> = {
-    low: "bg-slate-500",
-    medium: "bg-blue-500",
-    high: "bg-amber-500",
+    low: "bg-muted-foreground/50",
+    medium: "bg-primary",
+    high: "bg-primary",
     critical: "bg-red-500",
   };
 
@@ -171,7 +171,7 @@ function DealCard({
         <div className="flex items-center gap-2">
           {deal.deal_score !== null && (
             <div className="flex items-center gap-0.5">
-              <Sparkles className="h-2.5 w-2.5 text-amber-500" />
+              <Sparkles className="h-2.5 w-2.5 text-primary" />
               <span className="text-[10px] font-medium">
                 {Math.round(deal.deal_score)}
               </span>

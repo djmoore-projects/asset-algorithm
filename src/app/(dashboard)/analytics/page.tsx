@@ -90,7 +90,7 @@ export default async function AnalyticsPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">Companies Sourced</p>
-              <Target className="h-4 w-4 text-blue-500" />
+              <Target className="h-4 w-4 text-primary" />
             </div>
             <p className="mt-1 text-2xl font-bold">{companies.length}</p>
             <p className="text-xs text-muted-foreground">{companies.filter((c: any) => c.status === "qualified").length} qualified</p>
@@ -100,7 +100,7 @@ export default async function AnalyticsPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">Contacts</p>
-              <Users className="h-4 w-4 text-purple-500" />
+              <Users className="h-4 w-4 text-primary" />
             </div>
             <p className="mt-1 text-2xl font-bold">{contacts.length}</p>
             <p className="text-xs text-muted-foreground">{contacts.filter((c: any) => c.role_type === "owner").length} owners</p>
@@ -110,7 +110,7 @@ export default async function AnalyticsPage() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <p className="text-xs text-muted-foreground">Avg Deal Score</p>
-              <BarChart3 className="h-4 w-4 text-orange-500" />
+              <BarChart3 className="h-4 w-4 text-primary" />
             </div>
             <p className="mt-1 text-2xl font-bold">{avgDealScore}/100</p>
           </CardContent>

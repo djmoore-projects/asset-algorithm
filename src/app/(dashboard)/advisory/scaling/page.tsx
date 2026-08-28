@@ -18,19 +18,19 @@ const PLAYBOOKS = [
     { name: "New Markets", desc: "Geographic expansion, adjacent verticals, or new customer segments" },
     { name: "Digital Marketing", desc: "SEO, paid ads, content marketing, and lead generation" },
   ]},
-  { icon: Cog, title: "Operational Efficiency", color: "text-blue-500", strategies: [
+  { icon: Cog, title: "Operational Efficiency", color: "text-primary", strategies: [
     { name: "Process Automation", desc: "Identify manual processes and implement technology solutions" },
     { name: "Supply Chain", desc: "Optimize vendor relationships, negotiate better terms, consolidate" },
     { name: "Labor Optimization", desc: "Right-size team, improve training, reduce turnover" },
     { name: "Quality Systems", desc: "Implement quality management to reduce waste and rework" },
   ]},
-  { icon: Users, title: "Team Building", color: "text-purple-500", strategies: [
+  { icon: Users, title: "Team Building", color: "text-primary", strategies: [
     { name: "Leadership Hire", desc: "Recruit GM or COO to run day-to-day operations" },
     { name: "Incentive Alignment", desc: "Performance bonuses, equity participation, retention packages" },
     { name: "Culture Building", desc: "Establish values, communication cadence, and team rituals" },
     { name: "Training Programs", desc: "Technical skills, leadership development, cross-training" },
   ]},
-  { icon: Target, title: "KPI Framework", color: "text-orange-500", strategies: [
+  { icon: Target, title: "KPI Framework", color: "text-primary", strategies: [
     { name: "Financial KPIs", desc: "Revenue growth, gross margin, EBITDA margin, cash conversion" },
     { name: "Customer KPIs", desc: "CAC, LTV, churn rate, NPS, repeat purchase rate" },
     { name: "Operational KPIs", desc: "Utilization rate, cycle time, defect rate, on-time delivery" },

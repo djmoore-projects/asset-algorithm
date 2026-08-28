@@ -357,9 +357,9 @@ export default function ScannerPage() {
             Discover acquisition targets automatically
           </p>
         </div>
-        <Card className="border-amber-500/50 bg-amber-500/5">
+        <Card className="border-primary/50 bg-primary/5">
           <CardContent className="flex items-start gap-4 p-6">
-            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
             <div className="space-y-3">
               <h3 className="font-semibold">Apollo API Key Required</h3>
               <p className="text-sm text-muted-foreground">
@@ -396,13 +396,13 @@ export default function ScannerPage() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {!apiStatus?.hunter_configured && !apiStatus?.apollo_configured && (
-            <Badge variant="outline" className="gap-1 text-amber-500 border-amber-500/50">
+            <Badge variant="outline" className="gap-1 text-primary border-primary/50">
               <AlertCircle className="h-3 w-3" />
               Add HUNTER_API_KEY + APOLLO_API_KEY for contacts
             </Badge>
           )}
           {!apiStatus?.anthropic_configured && (
-            <Badge variant="outline" className="gap-1 text-amber-500 border-amber-500/50">
+            <Badge variant="outline" className="gap-1 text-primary border-primary/50">
               <AlertCircle className="h-3 w-3" />
               Add ANTHROPIC_API_KEY for AI scoring
             </Badge>
@@ -712,19 +712,19 @@ export default function ScannerPage() {
                           )}
                           {cd.linkedin_url && (
                             <a href={cd.linkedin_url} target="_blank" rel="noopener noreferrer">
-                              <Badge variant="outline" className="text-[10px] text-blue-400 border-blue-400/50 hover:bg-blue-400/10">
+                              <Badge variant="outline" className="text-[10px] text-primary border-primary/50 hover:bg-primary/10">
                                 LinkedIn
                               </Badge>
                             </a>
                           )}
                           {/* Source badges */}
                           {enrichSources.includes("hunter") && (
-                            <Badge variant="outline" className="text-[10px] text-orange-500 border-orange-500/30">
+                            <Badge variant="outline" className="text-[10px] text-primary border-primary/30">
                               Hunter.io
                             </Badge>
                           )}
                           {enrichSources.includes("apollo") && (
-                            <Badge variant="outline" className="text-[10px] text-purple-500 border-purple-500/30">
+                            <Badge variant="outline" className="text-[10px] text-primary border-primary/30">
                               Apollo
                             </Badge>
                           )}
@@ -735,13 +735,13 @@ export default function ScannerPage() {
                             </Badge>
                           )}
                           {(enrichSources.includes("public_records") || hasPublicRecords) && (
-                            <Badge variant="outline" className="text-[10px] text-blue-500 border-blue-500/30">
+                            <Badge variant="outline" className="text-[10px] text-primary border-primary/30">
                               <FileText className="mr-0.5 h-2.5 w-2.5" />
                               Public Records
                             </Badge>
                           )}
                           {enrichSources.includes("google_search") && (
-                            <Badge variant="outline" className="text-[10px] text-yellow-500 border-yellow-500/30">
+                            <Badge variant="outline" className="text-[10px] text-primary border-primary/30">
                               <Search className="mr-0.5 h-2.5 w-2.5" />
                               Google Search
                             </Badge>
@@ -753,7 +753,7 @@ export default function ScannerPage() {
                                 cd.confidence === "high"
                                   ? "text-emerald-500 border-emerald-500/30"
                                   : cd.confidence === "medium"
-                                  ? "text-amber-500 border-amber-500/30"
+                                  ? "text-primary border-primary/30"
                                   : "text-muted-foreground"
                               }`}
                             >
@@ -772,7 +772,7 @@ export default function ScannerPage() {
                               {o.position}: {o.name}
                             </Badge>
                           ))}
-                          <Badge variant="outline" className="text-[10px] text-blue-500 border-blue-500/30">
+                          <Badge variant="outline" className="text-[10px] text-primary border-primary/30">
                             Public Records
                           </Badge>
                         </div>

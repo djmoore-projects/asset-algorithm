@@ -14,7 +14,7 @@ import { DealSelector } from "@/components/advisory/deal-selector";
 
 const CATEGORIES = ["financial", "legal", "operational", "market", "team", "technology", "environmental"];
 const STATUS_ICONS: Record<string, any> = { not_started: Circle, in_progress: MinusCircle, completed: CheckCircle2, flagged: AlertTriangle, na: MinusCircle };
-const RISK_COLORS: Record<string, string> = { low: "bg-green-500/10 text-green-500", medium: "bg-yellow-500/10 text-yellow-500", high: "bg-orange-500/10 text-orange-500", critical: "bg-red-500/10 text-red-500" };
+const RISK_COLORS: Record<string, string> = { low: "bg-green-500/10 text-green-500", medium: "bg-primary/10 text-primary", high: "bg-primary/10 text-primary", critical: "bg-red-500/10 text-red-500" };
 
 const DEFAULT_INPUTS = { deal_name: "", industry: "", asking_price: "", ebitda: "" };
 

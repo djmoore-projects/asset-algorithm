@@ -6,9 +6,9 @@ import { format } from "date-fns";
 
 const STATUS_COLORS: Record<string, string> = {
   completed: "bg-green-500/10 text-green-500",
-  no_answer: "bg-yellow-500/10 text-yellow-500",
-  voicemail: "bg-blue-500/10 text-blue-500",
-  busy: "bg-orange-500/10 text-orange-500",
+  no_answer: "bg-primary/10 text-primary",
+  voicemail: "bg-primary/10 text-primary",
+  busy: "bg-primary/10 text-primary",
   failed: "bg-red-500/10 text-red-500",
 };
 
@@ -51,10 +51,10 @@ export default async function CallsPage() {
             <Card key={call.id} className="border-border/50">
               <CardContent className="flex items-center gap-4 p-4">
                 <div
-                  className={`flex h-10 w-10 items-center justify-center rounded-full ${call.direction === "outbound" ? "bg-blue-500/10" : "bg-green-500/10"}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full ${call.direction === "outbound" ? "bg-primary/10" : "bg-green-500/10"}`}
                 >
                   {call.direction === "outbound" ? (
-                    <Phone className="h-4 w-4 text-blue-500" />
+                    <Phone className="h-4 w-4 text-primary" />
                   ) : (
                     <PhoneIncoming className="h-4 w-4 text-green-500" />
                   )}

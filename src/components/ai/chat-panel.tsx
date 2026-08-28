@@ -109,8 +109,8 @@ export function AIChatPanel() {
         <SheetHeader className="border-b border-border/50 px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-500/10">
-                <Sparkles className="h-3.5 w-3.5 text-violet-500" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
               </div>
               <SheetTitle className="text-sm font-semibold">
                 AI Co-Pilot
@@ -148,7 +148,7 @@ export function AIChatPanel() {
                     className={cn(
                       "text-xs",
                       message.role === "assistant" &&
-                        "bg-violet-500/10 text-violet-500"
+                        "bg-primary/10 text-primary"
                     )}
                   >
                     {message.role === "user" ? (

@@ -7,7 +7,7 @@ import Link from "next/link";
 export default async function ContactDetailPage({ params }: { params: Promise<{ contactId: string }> }) {
   const { contactId } = await params;
   const contact = await getContact(contactId);
-  const scoreColor = !contact.relationship_score ? "text-muted-foreground" : contact.relationship_score >= 75 ? "text-green-500" : contact.relationship_score >= 50 ? "text-yellow-500" : "text-red-500";
+  const scoreColor = !contact.relationship_score ? "text-muted-foreground" : contact.relationship_score >= 75 ? "text-green-500" : contact.relationship_score >= 50 ? "text-primary" : "text-red-500";
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">

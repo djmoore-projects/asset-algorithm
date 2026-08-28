@@ -187,10 +187,10 @@ export default function SourcingPage() {
   }
 
   const statusColors: Record<string, string> = {
-    new: "bg-slate-500/10 text-slate-500",
-    researching: "bg-blue-500/10 text-blue-500",
+    new: "bg-muted text-muted-foreground",
+    researching: "bg-primary/10 text-primary",
     qualified: "bg-emerald-500/10 text-emerald-500",
-    contacted: "bg-violet-500/10 text-violet-500",
+    contacted: "bg-primary/10 text-primary",
     disqualified: "bg-red-500/10 text-red-500",
   };
 
@@ -401,12 +401,12 @@ export default function SourcingPage() {
                     {scoringId === company.id ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     ) : (
-                      <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                      <Sparkles className="h-3.5 w-3.5 text-primary" />
                     )}
                   </Button>
                   {company.icp_score !== null && company.icp_score !== undefined && (
                     <div className="flex items-center gap-1">
-                      <Sparkles className="h-3 w-3 text-amber-500" />
+                      <Sparkles className="h-3 w-3 text-primary" />
                       <span className="text-xs font-medium">
                         {Math.round(company.icp_score)}
                       </span>

@@ -48,10 +48,10 @@ export default function OutreachPage() {
   };
 
   const statusColors: Record<string, string> = {
-    draft: "bg-slate-500/10 text-slate-500",
+    draft: "bg-muted text-muted-foreground",
     active: "bg-emerald-500/10 text-emerald-500",
-    paused: "bg-amber-500/10 text-amber-500",
-    completed: "bg-blue-500/10 text-blue-500",
+    paused: "bg-primary/10 text-primary",
+    completed: "bg-primary/10 text-primary",
   };
 
   return (
@@ -69,10 +69,10 @@ export default function OutreachPage() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard title="Active Campaigns" value={activeCampaigns.length} icon="Target" iconColor="text-blue-500" />
-        <MetricCard title="Total Sent" value={totalSent} icon="Mail" iconColor="text-violet-500" />
+        <MetricCard title="Active Campaigns" value={activeCampaigns.length} icon="Target" iconColor="text-primary" />
+        <MetricCard title="Total Sent" value={totalSent} icon="Mail" iconColor="text-primary" />
         <MetricCard title="Total Replies" value={totalReplied} icon="Activity" iconColor="text-emerald-500" />
-        <MetricCard title="Meetings Booked" value={totalBooked} icon="Calendar" iconColor="text-amber-500" />
+        <MetricCard title="Meetings Booked" value={totalBooked} icon="Calendar" iconColor="text-primary" />
       </div>
 
       {campaigns.length === 0 && !loading ? (

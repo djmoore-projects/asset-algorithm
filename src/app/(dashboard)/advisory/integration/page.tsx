@@ -11,9 +11,9 @@ import { toast } from "sonner";
 import { DealSelector } from "@/components/advisory/deal-selector";
 
 const PHASES = [
-  { title: "Day 1-30: Stabilize", icon: Settings, color: "text-blue-500", items: ["Announce ownership transition to all employees", "Meet with every key employee 1-on-1", "Secure all critical vendor relationships", "Audit existing contracts and obligations", "Establish new banking and accounting", "Implement financial reporting cadence", "Review and secure IT systems access"] },
+  { title: "Day 1-30: Stabilize", icon: Settings, color: "text-primary", items: ["Announce ownership transition to all employees", "Meet with every key employee 1-on-1", "Secure all critical vendor relationships", "Audit existing contracts and obligations", "Establish new banking and accounting", "Implement financial reporting cadence", "Review and secure IT systems access"] },
   { title: "Day 31-60: Optimize", icon: BarChart3, color: "text-green-500", items: ["Identify quick-win operational improvements", "Implement KPI tracking dashboard", "Review and renegotiate supplier contracts", "Assess technology stack and identify gaps", "Begin customer satisfaction assessment", "Document all standard operating procedures"] },
-  { title: "Day 61-100: Accelerate", icon: Users, color: "text-purple-500", items: ["Launch growth initiatives identified in diligence", "Hire for critical gaps in team", "Implement new systems and processes", "Begin cross-selling or upselling programs", "Establish board or advisory board cadence", "Set 12-month strategic plan with milestones"] },
+  { title: "Day 61-100: Accelerate", icon: Users, color: "text-primary", items: ["Launch growth initiatives identified in diligence", "Hire for critical gaps in team", "Implement new systems and processes", "Begin cross-selling or upselling programs", "Establish board or advisory board cadence", "Set 12-month strategic plan with milestones"] },
 ];
 
 const DEFAULT_INPUTS = { business_name: "", industry: "", employee_count: "", annual_revenue: "" };

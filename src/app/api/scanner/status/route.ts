@@ -37,6 +37,6 @@ export async function GET() {
       google_calendar_configured: hasGoogleCreds,
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("[Scanner.Status]", error instanceof Error ? error.message : error); return NextResponse.json({ error: "Failed to fetch scan status" }, { status: 500 });
   }
 }

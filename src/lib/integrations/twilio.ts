@@ -20,7 +20,25 @@ export async function sendSMS({ to, body, from }: { to: string; body: string; fr
   return { sid: message.sid, status: message.status, to: message.to, from: message.from };
 }
 
+/**
+ * Places an automated outbound call.
+ *
+ * Disabled for cold outreach. Two reasons, and either one is enough:
+ * an artificial voice pitching an acquisition gets hung up on, and the TCPA
+ * requires prior express written consent before a prerecorded or artificial
+ * voice reaches a mobile number. Cold prospects have given no such consent.
+ *
+ * Nothing calls this today. Prospect calls get dialed by a person reading the
+ * generated script. Wiring it back up means gating it to contacts with
+ * recorded consent, so the guard stays until that exists.
+ */
 export async function initiateCall({ to, from, record }: { to: string; from?: string; record?: boolean }) {
+  if (process.env.ENABLE_AUTOMATED_CALLS !== "true") {
+    throw new Error(
+      "Automated calling is disabled. Prospect calls are dialed manually using the generated script."
+    );
+  }
+
   const client = getTwilioClient();
   const fromNumber = from || process.env.TWILIO_PHONE_NUMBER;
   if (!fromNumber) throw new Error("TWILIO_PHONE_NUMBER not configured");

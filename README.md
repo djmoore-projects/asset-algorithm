@@ -6,9 +6,13 @@ Built for self-funded searchers, independent sponsors, and search fund operators
 
 ## What This Does
 
-**Scanner** — Discovers acquisition targets via Google Places API, enriches with Hunter.io and Apollo contact data, and scores every lead against your custom ICP using Claude.
+**Scanner** — Discovers acquisition targets through Apollo, filtered by industry, location and company size, then enriches with Hunter.io and website scraping. Every lead is scored against your ICP by Claude, weighted toward succession signals: business age is the strongest available proxy for owner retirement, which drives most small-business sales.
 
 **Multi-Channel Outreach** — Generates and executes personalized email (Resend), SMS, voice (Twilio), and LinkedIn sequences. AI writes each touchpoint with deal-specific context — not templates.
+
+**Outreach Safety** — Global suppression across every channel, a one-click unsubscribe page satisfying CAN-SPAM, and a per-domain daily send governor that ramps new senders from 10/day rather than opening at full volume. Hard bounces suppress the contact automatically.
+
+**Autopilot** — Contacts clearing your ICP threshold are enrolled into a campaign and sent step 1 by a daily cron, with every message AI-written against that specific business. Suppression and the send budget both apply.
 
 **Pipeline & CRM** — Kanban deal tracker with stage-gated workflows, relationship management, meeting prep with Google Calendar integration, and full activity history.
 
@@ -40,7 +44,7 @@ src/
 │   ├── ai/            # Anthropic SDK integration, prompt management
 │   ├── billing/       # Stripe checkout, webhooks, usage metering, plan limits
 │   ├── integrations/  # Google Calendar, Resend, Twilio clients
-│   ├── scanner/       # Google Places discovery, contact enrichment pipeline
+│   ├── scanner/       # Apollo discovery, contact enrichment pipeline
 │   ├── supabase/      # Typed client, admin client, middleware helpers
 │   └── utils/         # Rate limiting, validation, formatters
 ├── stores/            # Zustand state management
@@ -48,6 +52,12 @@ src/
 supabase/
 └── migrations/        # 15 versioned migrations with RLS policies
 ```
+
+## Schema Discipline
+
+`supabase/full-migration.sql` is the single source of truth, and it is idempotent, so it replays safely from any state. A CI check (`npm run check:schema`) diffs every `insert`, `update` and `upsert` in the codebase against that schema and fails the build on a mismatch.
+
+That check exists because the same bug shipped three times: code writing a column the table did not have, the row silently rejected, and the feature failing somewhere that looked unrelated. The scanner returning zero results turned out to be every result insert being rejected over one stray column.
 
 ## Technical Decisions
 
@@ -76,7 +86,7 @@ supabase/
 | Payments | Stripe (Checkout, Billing Portal, Webhooks) |
 | Email | Resend |
 | Voice/SMS | Twilio |
-| Data Enrichment | Google Places API, Hunter.io, Apollo.io |
+| Data Enrichment | Apollo.io, Hunter.io, website scraping |
 | Calendar | Google Calendar API (OAuth) |
 | Analytics | PostHog (client + server) |
 | UI | shadcn/ui, Radix, Tailwind CSS, Recharts |
@@ -121,7 +131,7 @@ See `.env.example` for the full list. Required services:
 - **Stripe** — Billing and subscription management
 
 Optional (feature-gated):
-- **Google Places** — Scanner discovery
+- **Apollo** — Scanner discovery and contact enrichment
 - **Hunter.io / Apollo** — Contact enrichment
 - **Resend** — Email outreach
 - **Twilio** — SMS and voice outreach

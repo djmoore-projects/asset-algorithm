@@ -3,6 +3,12 @@
  * to maximize chances of finding owner names and contact info.
  */
 
+import { isSafeUrl } from "@/lib/api-utils";
+
+function isSafeExternalUrl(url: string): boolean {
+  return isSafeUrl(url);
+}
+
 const BROWSER_UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
@@ -33,6 +39,9 @@ export async function scrapeWebsiteText(url: string): Promise<string | null> {
     // Normalize URL
     let baseUrl = url;
     if (!baseUrl.startsWith("http")) baseUrl = `https://${baseUrl}`;
+
+    // SSRF protection: block private/internal URLs
+    if (!isSafeExternalUrl(baseUrl)) return null;
 
     // 1. Fetch homepage
     const homepageHtml = await fetchPage(baseUrl);

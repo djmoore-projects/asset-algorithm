@@ -2,17 +2,27 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getAnthropicClient, AI_MODEL } from "@/lib/ai/client";
 import { LEAD_SCORING_PROMPT } from "@/lib/ai/prompts/scoring";
+import { z } from "zod";
+import { authenticateAndLimit, validateBody, handleApiError } from "@/lib/api-utils";
+import { RATE_LIMITS } from "@/lib/rate-limit";
+
+const EnrichSchema = z.object({
+  companyId: z.string().uuid(),
+});
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await authenticateAndLimit(req, "ai", RATE_LIMITS.ai);
+    if (auth.error) return auth.error;
+
+    const raw = await req.json();
+    const validation = validateBody(raw, EnrichSchema);
+    if (validation.error) return validation.error;
+
+    const { companyId } = validation.data;
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { companyId } = await req.json();
-    if (!companyId) return NextResponse.json({ error: "companyId is required" }, { status: 400 });
-
-    const { data: company, error } = await supabase.from("companies").select("*").eq("id", companyId).eq("user_id", user.id).single();
+    const { data: company, error } = await supabase.from("companies").select("*").eq("id", companyId).eq("user_id", auth.user.id).single();
     if (error || !company) return NextResponse.json({ error: "Company not found" }, { status: 404 });
 
     const client = getAnthropicClient();
@@ -32,7 +42,7 @@ export async function POST(req: NextRequest) {
     await supabase.from("companies").update(updates).eq("id", companyId);
 
     return NextResponse.json({ score, summary });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return handleApiError(error, "Sourcing.Enrich");
   }
 }

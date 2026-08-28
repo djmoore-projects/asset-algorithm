@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { User, Key, Users, Target } from "lucide-react";
+import { User, Key, Users, Target, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import type { Database } from "@/types/database";
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
@@ -10,6 +10,7 @@ const SETTINGS_LINKS = [
   { href: "/settings/integrations", icon: Key, title: "Integrations", description: "API keys, email, SMS, and LinkedIn connections" },
   { href: "/settings/team", icon: Users, title: "Team", description: "Manage team members and permissions" },
   { href: "/settings/icp", icon: Target, title: "Ideal Company Profile", description: "Configure your target acquisition criteria" },
+  { href: "/settings/outreach", icon: ShieldCheck, title: "Outreach Safety", description: "Daily send limits and your suppression list" },
 ];
 
 export default async function SettingsPage() {

@@ -128,7 +128,8 @@ export async function POST(req: NextRequest) {
         hangoutLink: event.hangoutLink,
       },
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    console.error("[Calendar.Book]", error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: "Failed to book meeting. Please try again." }, { status: 500 });
   }
 }

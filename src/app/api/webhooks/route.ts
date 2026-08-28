@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getAnthropicClient, AI_MODEL, parseAIJson, isAnthropicConfigured } from "@/lib/ai/client";
 import { escapeHtml, verifyTwilioSignature, verifyResendSignature } from "@/lib/security";
+import { suppressContact } from "@/lib/outreach/suppression";
 
 export async function POST(req: NextRequest) {
   try {
@@ -64,6 +65,21 @@ export async function POST(req: NextRequest) {
               status: newStatus,
               ...(type === "email.opened" ? { opened_at: new Date().toISOString() } : {}),
             }).eq("provider_message_id", emailId);
+
+            // A bounce means the address is dead. Suppress the contact so no
+            // campaign spends further budget — or sender reputation — on it.
+            if (newStatus === "bounced") {
+              const { data: bounced } = await supabase
+                .from("outreach_messages")
+                .select("contact_id")
+                .eq("provider_message_id", emailId)
+                .maybeSingle();
+              const contactId = (bounced as { contact_id: string } | null)?.contact_id;
+              if (contactId) {
+                await suppressContact(supabase, contactId, "bounced");
+                console.log(`[Webhook] Suppressed contact ${contactId} after hard bounce`);
+              }
+            }
           }
         }
         break;

@@ -51,6 +51,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ slots, total: slots.length });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("[Calendar.Slots]", error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: "Failed to fetch calendar slots" }, { status: 500 });
   }
 }

@@ -52,7 +52,7 @@ export default function PricingPage() {
       return;
     }
     if (planId === "enterprise") {
-      window.location.href = "mailto:sales@assetalgorithm.com";
+      window.location.href = "mailto:sales@aismartr.com";
       return;
     }
     // For pro, redirect to checkout

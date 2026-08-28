@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { searchPlaces, mapPlaceToBusinessData, inferIndustryFromTypes } from "@/lib/scanner/google-places";
+import { searchCompanies, mapOrganizationToBusinessData } from "@/lib/scanner/apollo";
 import { getAnthropicClient, AI_MODEL, isAnthropicConfigured, parseAIJson } from "@/lib/ai/client";
 import { SCANNER_ENRICHMENT_PROMPT } from "@/lib/ai/prompts/scanner";
 import { rateLimit, RATE_LIMITS } from "@/lib/rate-limit";
-import type { ScanCriteria } from "@/lib/scanner/google-places";
+import { runWithConcurrency } from "@/lib/scanner/concurrency";
+import type { ScanCriteria } from "@/lib/scanner/apollo";
 
 export const maxDuration = 120;
+
+/** Parallel AI scoring calls. Anthropic tolerates this comfortably. */
+const SCORING_CONCURRENCY = 6;
+/** Stop scoring with time left to write results and close out the scan. */
+const SCORING_BUDGET_MS = 40_000;
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,13 +29,13 @@ export async function POST(req: NextRequest) {
     }
 
     const criteria: ScanCriteria = await req.json();
-    if (!criteria.query || !criteria.location) {
+    if (!criteria.query || typeof criteria.query !== "string" || !criteria.location || typeof criteria.location !== "string") {
       return NextResponse.json({ error: "query and location are required" }, { status: 400 });
     }
 
-    if (!process.env.GOOGLE_PLACES_API_KEY) {
+    if (!process.env.APOLLO_API_KEY) {
       return NextResponse.json({
-        error: "GOOGLE_PLACES_API_KEY not configured",
+        error: "APOLLO_API_KEY not configured",
         setup_required: true,
       }, { status: 400 });
     }
@@ -49,19 +55,19 @@ export async function POST(req: NextRequest) {
     if (scanError || !scan) throw scanError || new Error("Failed to create scan");
     const scanRecord = scan as unknown as { id: string };
 
-    // Search Google Places
-    let places;
+    // Search Apollo for acquisition targets
+    let organizations;
     try {
-      places = await searchPlaces(criteria);
+      organizations = await searchCompanies(criteria);
     } catch (apiError: any) {
       await supabase
         .from("scans")
-        .update({ status: "failed" })
+        .update({ status: "failed", error_message: apiError.message })
         .eq("id", scanRecord.id);
       return NextResponse.json({ error: apiError.message }, { status: 502 });
     }
 
-    if (!places.length) {
+    if (!organizations.length) {
       await supabase
         .from("scans")
         .update({ status: "completed", results_count: 0 })
@@ -82,17 +88,20 @@ export async function POST(req: NextRequest) {
       }
     } catch {}
 
-    // Process each place into scan results
-    const results = [];
+    // Process each organization into scan results.
+    //
+    // Scoring runs concurrently. One AI call per business, done sequentially,
+    // exceeded the serverless function ceiling well before 25 businesses were
+    // scored, and the run died before writing a single row. The budget below
+    // leaves headroom to still record results and mark the scan finished.
     const hasAI = isAnthropicConfigured();
 
-    for (const place of places) {
-      const businessData = mapPlaceToBusinessData(place);
-      let icpScore = null;
-      let aiSummary = null;
+    const tasks = organizations.map((org) => async () => {
+      const businessData = mapOrganizationToBusinessData(org, criteria.location);
+      let icpScore: number | null = null;
+      let aiSummary: string | null = null;
       let enrichmentData: any = {};
 
-      // AI enrichment (if Anthropic key is available)
       if (hasAI) {
         try {
           const client = getAnthropicClient();
@@ -109,32 +118,30 @@ export async function POST(req: NextRequest) {
           const text = response.content[0].type === "text" ? response.content[0].text : "";
           try {
             const parsed = parseAIJson(text);
-            icpScore = parsed.icp_score || null;
-            aiSummary = parsed.summary || null;
+            icpScore = parsed.icp_score ?? null;
+            aiSummary = parsed.summary ?? null;
             enrichmentData = parsed.inferred_contact || {};
             if (parsed.acquisition_signals) {
               enrichmentData.acquisition_signals = parsed.acquisition_signals;
             }
           } catch {
-            // If JSON parsing still fails, extract any plain text summary
             const cleaned = text.replace(/```[\s\S]*?```/g, "").trim();
-            aiSummary = cleaned.slice(0, 500) || text.slice(0, 500);
+            aiSummary = (cleaned || text).slice(0, 500);
           }
         } catch {
-          // AI enrichment failed silently - continue without it
+          // Scoring is best effort. A business with no score still gets saved.
         }
       }
 
+      // scan_results has no user_id column. Ownership is derived through
+      // scan_id, which is how the RLS policies on this table resolve it.
       const { data: result, error: resultError } = await supabase
         .from("scan_results")
         .insert({
           scan_id: scanRecord.id,
-          user_id: user.id,
           business_name: businessData.name,
           business_data: businessData,
-          contact_data: {
-            phone: businessData.phone,
-          },
+          contact_data: { phone: businessData.phone },
           enrichment_data: enrichmentData,
           icp_score: icpScore,
           ai_summary: aiSummary,
@@ -142,9 +149,21 @@ export async function POST(req: NextRequest) {
         .select()
         .single();
 
-      if (!resultError && result) {
-        results.push(result);
-      }
+      if (resultError) throw new Error(resultError.message);
+      return result;
+    });
+
+    const settled = await runWithConcurrency(tasks, SCORING_CONCURRENCY, {
+      timeoutMs: SCORING_BUDGET_MS,
+    });
+
+    const results = settled.filter((r): r is Exclude<typeof r, Error> => !(r instanceof Error));
+    const failed = settled.length - results.length;
+    if (failed > 0) {
+      const firstErr = settled.find((r) => r instanceof Error) as Error | undefined;
+      console.error(
+        `[Scanner.Scan] ${failed}/${settled.length} results failed. First: ${firstErr?.message}`
+      );
     }
 
     // Update scan status
@@ -158,7 +177,8 @@ export async function POST(req: NextRequest) {
       results,
       total: results.length,
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    console.error("[Scanner.Scan]", error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: "Scan failed. Please try again." }, { status: 500 });
   }
 }

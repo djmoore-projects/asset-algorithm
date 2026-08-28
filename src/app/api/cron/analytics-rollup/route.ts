@@ -42,6 +42,6 @@ export async function GET(req: NextRequest) {
     }
     return NextResponse.json({ processed, date: today });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("[Cron.AnalyticsRollup]", error instanceof Error ? error.message : error); return NextResponse.json({ error: "Rollup failed" }, { status: 500 });
   }
 }

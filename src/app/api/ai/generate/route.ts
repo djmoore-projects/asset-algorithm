@@ -73,10 +73,8 @@ export async function POST(request: NextRequest) {
       .join("");
 
     return NextResponse.json({ content: text, usage: response.usage });
-  } catch (error: any) {
-    console.error("Generate error:", error);
-    const message = error?.message || "Generation failed";
-    const status = error?.status || 500;
-    return NextResponse.json({ error: message }, { status });
+  } catch (error) {
+    console.error("[AI.Generate]", error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: "Generation failed. Please try again." }, { status: 500 });
   }
 }

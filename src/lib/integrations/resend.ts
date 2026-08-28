@@ -17,7 +17,7 @@ export async function sendEmail({
   to: string | string[]; subject: string; html?: string; text?: string; from?: string; replyTo?: string;
 }) {
   const client = getResendClient();
-  const fromAddress = from || process.env.RESEND_FROM_EMAIL || "outreach@assetalgorithm.com";
+  const fromAddress = from || process.env.RESEND_FROM_EMAIL || "outreach@aismartr.com";
   const { data, error } = await client.emails.send({
     from: fromAddress, to: Array.isArray(to) ? to : [to], subject,
     html: html || undefined, text: text || undefined, replyTo: replyTo || undefined,

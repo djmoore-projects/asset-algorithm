@@ -147,6 +147,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     console.error("Auto-book error:", error);
-    return NextResponse.json({ error: error.message, auto_book: false }, { status: 500 });
+    console.error("[Calendar.AutoBook]", error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: "Auto-booking failed", auto_book: false }, { status: 500 });
   }
 }

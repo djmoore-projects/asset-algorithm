@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -41,6 +42,7 @@ import {
   Trash2,
   UserPlus,
   Zap,
+  Rocket,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -90,6 +92,11 @@ export default function CampaignDetailPage() {
   // Launch
   const [launching, setLaunching] = useState(false);
 
+  // Autopilot
+  const [autoEnroll, setAutoEnroll] = useState(false);
+  const [autoMinScore, setAutoMinScore] = useState("70");
+  const [savingAutopilot, setSavingAutopilot] = useState(false);
+
   const supabase = createClient();
 
   const loadCampaign = useCallback(async () => {
@@ -102,7 +109,11 @@ export default function CampaignDetailPage() {
       supabase.from("outreach_messages").select("*, contacts(first_name, last_name, email), companies(name)").eq("campaign_id", campaignId).order("created_at", { ascending: false }).limit(20),
     ]);
 
-    if (campRes.data) setCampaign(campRes.data);
+    if (campRes.data) {
+      setCampaign(campRes.data);
+      setAutoEnroll(!!(campRes.data as any).auto_enroll);
+      setAutoMinScore(String((campRes.data as any).auto_enroll_min_score ?? 70));
+    }
     if (seqRes.data) setSequences(seqRes.data);
     if (msgRes.data) setMessages(msgRes.data);
 
@@ -317,6 +328,31 @@ export default function CampaignDetailPage() {
     setCampaign((prev: any) => ({ ...prev, target_contact_ids: newIds }));
     setContacts((prev) => prev.filter((c) => c.id !== contactId));
     toast.success("Contact removed");
+  }
+
+  async function saveAutopilot(enabled: boolean, minScore: string) {
+    const parsed = parseInt(minScore, 10);
+    if (Number.isNaN(parsed) || parsed < 0 || parsed > 100) {
+      toast.error("ICP score threshold must be between 0 and 100");
+      return;
+    }
+    setSavingAutopilot(true);
+    const { error } = await supabase
+      .from("outreach_campaigns")
+      .update({ auto_enroll: enabled, auto_enroll_min_score: parsed } as any)
+      .eq("id", campaignId);
+    setSavingAutopilot(false);
+
+    if (error) {
+      toast.error("Couldn't save autopilot settings");
+      return;
+    }
+    setAutoEnroll(enabled);
+    toast.success(
+      enabled
+        ? `Autopilot on — owners at companies scoring ${parsed}+ will be enrolled daily`
+        : "Autopilot off"
+    );
   }
 
   async function handleLaunch() {
@@ -570,6 +606,62 @@ export default function CampaignDetailPage() {
         <Card className="border-border/50"><CardContent className="p-4 text-center"><p className="text-2xl font-bold">{stats.replied || 0}</p><p className="text-xs text-muted-foreground">Replied</p></CardContent></Card>
         <Card className="border-border/50"><CardContent className="p-4 text-center"><p className="text-2xl font-bold">{stats.meetings_booked || 0}</p><p className="text-xs text-muted-foreground">Meetings</p></CardContent></Card>
       </div>
+
+      {/* Autopilot */}
+      <Card className="border-border/50">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-4">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <Rocket className="h-4 w-4" />
+              Autopilot
+            </CardTitle>
+            <Switch
+              checked={autoEnroll}
+              disabled={savingAutopilot || sequences.length === 0}
+              onCheckedChange={(checked) => saveAutopilot(checked, autoMinScore)}
+            />
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            {sequences.length === 0
+              ? "Add a sequence step before turning on autopilot."
+              : "Each day, owners at companies scoring at or above your threshold are enrolled and sent step 1 — no clicking required. Suppressed contacts are skipped, and your daily send limit still applies."}
+          </p>
+          <div className="flex items-end gap-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="auto-score" className="text-xs">
+                Minimum ICP score
+              </Label>
+              <Input
+                id="auto-score"
+                type="number"
+                min={0}
+                max={100}
+                value={autoMinScore}
+                onChange={(e) => setAutoMinScore(e.target.value)}
+                className="h-8 max-w-24"
+              />
+            </div>
+            {autoEnroll && (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={savingAutopilot}
+                onClick={() => saveAutopilot(true, autoMinScore)}
+              >
+                Update
+              </Button>
+            )}
+          </div>
+          <Link
+            href="/settings/outreach"
+            className="inline-block text-xs text-primary hover:underline"
+          >
+            Daily send limit and suppression list &rarr;
+          </Link>
+        </CardContent>
+      </Card>
 
       {/* Sequence Steps */}
       <Card className="border-border/50">

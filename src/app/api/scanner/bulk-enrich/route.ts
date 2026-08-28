@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { scanId } = await req.json();
+    const body = await req.json();
+    const scanId = typeof body?.scanId === "string" && body.scanId.length > 0 ? body.scanId : null;
     if (!scanId) return NextResponse.json({ error: "scanId is required" }, { status: 400 });
 
     const { data: scan, error: scanError } = await supabase
@@ -64,9 +65,11 @@ export async function POST(req: NextRequest) {
       const businessData = result.business_data || {};
       const website = businessData.website;
       const businessName = result.business_name || businessData.name || "";
+      // Apollo results carry location_city/location_state from the search
+      // criteria; older Places-sourced rows still have a formatted address.
       const address = businessData.formatted_address || "";
-      const stateCode = parseStateFromAddress(address);
-      const city = parseCityFromAddress(address);
+      const stateCode = businessData.location_state || parseStateFromAddress(address);
+      const city = businessData.location_city || parseCityFromAddress(address);
       const locationStr = city && stateCode ? `${city}, ${stateCode}` : city || stateCode || "";
 
       console.log(`[Enrich] Starting: ${businessName} | website: ${website || "none"}`);
@@ -280,8 +283,8 @@ If no contact information is found, return: {"contacts": []}`;
       total: unenriched.length,
       status: finalStatus,
     });
-  } catch (error: any) {
-    console.error("Bulk enrich error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    console.error("[Scanner.BulkEnrich]", error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: "Bulk enrichment failed. Please try again." }, { status: 500 });
   }
 }

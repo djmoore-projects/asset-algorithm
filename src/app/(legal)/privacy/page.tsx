@@ -125,8 +125,8 @@ export default function PrivacyPage() {
       <h2 className="mt-8 text-lg font-semibold">11. Contact</h2>
       <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
         For privacy-related inquiries or to exercise your data rights, contact us at{" "}
-        <a href="mailto:privacy@assetsandalgorithms.com" className="text-foreground underline underline-offset-4">
-          privacy@assetsandalgorithms.com
+        <a href="mailto:privacy@aismartr.com" className="text-foreground underline underline-offset-4">
+          privacy@aismartr.com
         </a>.
       </p>
     </div>

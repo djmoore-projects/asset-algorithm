@@ -13,7 +13,7 @@ export default function TermsPage() {
 
       <h2 className="mt-8 text-lg font-semibold">1. Service Description</h2>
       <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-        The Asset Algorithm (&quot;Service&quot;), operated at assetsandalgorithms.com, is an
+        The Asset Algorithm (&quot;Service&quot;), operated at assets.aismartr.com, is an
         AI-powered platform for business acquisition professionals. The Service provides deal
         sourcing, automated outreach, advisory analysis, relationship management, and related
         tools designed to streamline the acquisition process.
@@ -103,8 +103,8 @@ export default function TermsPage() {
       <h2 className="mt-8 text-lg font-semibold">10. Contact</h2>
       <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
         If you have questions about these Terms, please contact us at{" "}
-        <a href="mailto:support@assetsandalgorithms.com" className="text-foreground underline underline-offset-4">
-          support@assetsandalgorithms.com
+        <a href="mailto:support@aismartr.com" className="text-foreground underline underline-offset-4">
+          support@aismartr.com
         </a>.
       </p>
     </div>

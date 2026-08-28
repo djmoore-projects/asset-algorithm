@@ -1,5 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { authenticateAndLimit, handleApiError, apiError } from "@/lib/api-utils";
+import { RATE_LIMITS } from "@/lib/rate-limit";
 import { createClient } from "@/lib/supabase/server";
 
 function getStripe() {
@@ -8,34 +10,30 @@ function getStripe() {
   });
 }
 
-export async function POST() {
-  const stripe = getStripe();
+export async function POST(req: NextRequest) {
   try {
+    const auth = await authenticateAndLimit(req, "billing", RATE_LIMITS.general);
+    if (auth.error) return auth.error;
+
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { data: sub } = await (supabase as any)
       .from("subscriptions")
       .select("stripe_customer_id")
-      .eq("user_id", user.id)
+      .eq("user_id", auth.user.id)
       .single();
 
     if (!(sub as any)?.stripe_customer_id) {
-      return NextResponse.json({ error: "No billing account found" }, { status: 400 });
+      return apiError("No billing account found", 400);
     }
 
+    const stripe = getStripe();
     const session = await stripe.billingPortal.sessions.create({
       customer: (sub as any).stripe_customer_id,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (err: any) {
-    console.error("Portal error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (error) {
+    return handleApiError(error, "Portal");
   }
 }

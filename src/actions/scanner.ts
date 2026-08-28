@@ -74,32 +74,41 @@ export async function importScanResults(resultIds: string[]) {
       const bd = (result.business_data || {}) as Record<string, any>;
       const cd = (result.contact_data || {}) as Record<string, any>;
 
-      // Parse location from address
-      let locationCity = null;
-      let locationState = null;
-      if (bd.formatted_address) {
-        const parts = bd.formatted_address.split(",").map((s: string) => s.trim());
+      // Skip anything already in the pipeline. Domain is the reliable key —
+      // matching on name alone would collide across franchises and DBAs.
+      const domain = bd.domain || null;
+      if (domain) {
+        const { data: existing } = await supabase
+          .from("companies")
+          .select("id, name")
+          .eq("user_id", user.id)
+          .ilike("website", `%${domain}%`)
+          .limit(1)
+          .maybeSingle();
+
+        if (existing) {
+          await supabase
+            .from("scan_results")
+            .update({ imported: true, company_id: (existing as { id: string }).id })
+            .eq("id", resultId);
+          errors.push(`${result.business_name}: already in pipeline`);
+          continue;
+        }
+      }
+
+      // Apollo rows carry location resolved at scan time. Fall back to
+      // parsing a Places-style address for rows scanned before the switch.
+      let locationCity = bd.location_city || null;
+      let locationState = bd.location_state || null;
+      if (!locationState && bd.formatted_address) {
+        const parts = String(bd.formatted_address).split(",").map((s: string) => s.trim());
         if (parts.length >= 3) locationCity = parts[parts.length - 3];
-        const stateMatch = bd.formatted_address.match(/,\s*([A-Z]{2})\s+\d{5}/);
+        const stateMatch = String(bd.formatted_address).match(/,\s*([A-Z]{2})\s+\d{5}/);
         if (stateMatch) locationState = stateMatch[1];
       }
 
-      // Infer industry from types
       const ed = (result.enrichment_data || {}) as Record<string, any>;
-      let industry = ed?.industry_classification || null;
-      if (!industry && bd.types?.length) {
-        const typeMap: Record<string, string> = {
-          plumber: "Plumbing", electrician: "Electrical Services",
-          general_contractor: "General Contracting", hvac_contractor: "HVAC",
-          accounting: "Accounting", auto_repair: "Auto Services",
-          restaurant: "Food & Beverage", dentist: "Dental Practice",
-          real_estate_agency: "Real Estate", insurance_agency: "Insurance",
-          lawyer: "Legal Services",
-        };
-        for (const t of bd.types) {
-          if (typeMap[t]) { industry = typeMap[t]; break; }
-        }
-      }
+      const industry = bd.industry || ed?.industry_classification || null;
 
       // Create company
       const { data: company, error: companyError } = await (supabase
@@ -113,14 +122,15 @@ export async function importScanResults(resultIds: string[]) {
           website: bd.website || null,
           description: bd.description || null,
           source: "scraped",
-          source_url: bd.google_maps_url || null,
+          source_url: bd.linkedin_url || bd.website || null,
+          employee_count: bd.employee_count || null,
           enrichment_data: {
             ...bd,
             scanner_enrichment: ed,
           },
           icp_score: result.icp_score || null,
           ai_summary: result.ai_summary || null,
-          revenue_range: ed?.estimated_revenue_range || null,
+          revenue_range: bd.revenue_printed || ed?.estimated_revenue_range || null,
           tags: ["scanner"],
           status: "new",
         })

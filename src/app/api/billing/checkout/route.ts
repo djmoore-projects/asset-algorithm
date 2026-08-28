@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { z } from "zod";
+import { authenticateAndLimit, validateBody, handleApiError } from "@/lib/api-utils";
+import { RATE_LIMITS } from "@/lib/rate-limit";
+
+const CheckoutSchema = z.object({
+  price_id: z.string().min(1, "price_id is required"),
+});
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -10,57 +16,51 @@ function getStripe() {
 }
 
 export async function POST(req: NextRequest) {
-  const stripe = getStripe();
   try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const auth = await authenticateAndLimit(req, "billing", RATE_LIMITS.general);
+    if (auth.error) return auth.error;
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const body = await req.json();
+    const validation = validateBody(body, CheckoutSchema);
+    if (validation.error) return validation.error;
 
-    const { price_id } = await req.json();
-
-    if (!price_id) {
-      return NextResponse.json({ error: "Missing price_id" }, { status: 400 });
-    }
+    const { price_id } = validation.data;
+    const stripe = getStripe();
 
     // Get or create Stripe customer
     const adminSupabase = createAdminClient() as any;
     const { data: sub } = await adminSupabase
       .from("subscriptions")
       .select("stripe_customer_id")
-      .eq("user_id", user.id)
+      .eq("user_id", auth.user.id)
       .single();
 
     let customerId = (sub as any)?.stripe_customer_id;
 
     if (!customerId) {
       const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: { user_id: user.id },
+        email: auth.user.email,
+        metadata: { user_id: auth.user.id },
       });
       customerId = customer.id;
 
       await adminSupabase
         .from("subscriptions")
         .update({ stripe_customer_id: customerId })
-        .eq("user_id", user.id);
+        .eq("user_id", auth.user.id);
     }
 
-    // Create checkout session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       mode: "subscription",
       line_items: [{ price: price_id, quantity: 1 }],
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing?success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing?canceled=true`,
-      metadata: { user_id: user.id },
+      metadata: { user_id: auth.user.id },
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (err: any) {
-    console.error("Checkout error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (error) {
+    return handleApiError(error, "Checkout");
   }
 }

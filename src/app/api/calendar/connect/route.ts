@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
     const url = getAuthUrl(user.id);
     return NextResponse.json({ url });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("[Calendar.Connect]", error instanceof Error ? error.message : error);
+    return NextResponse.json({ error: "Failed to connect calendar" }, { status: 500 });
   }
 }

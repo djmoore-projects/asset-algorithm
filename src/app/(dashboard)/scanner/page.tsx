@@ -24,6 +24,9 @@ import {
   Phone,
   Star,
   MapPin,
+  CalendarClock,
+  DollarSign,
+  Linkedin,
   ExternalLink,
   Sparkles,
   ChevronDown,
@@ -65,8 +68,9 @@ interface Scan {
 export default function ScannerPage() {
   const [query, setQuery] = useState("");
   const [location, setLocation] = useState("");
-  const [maxResults, setMaxResults] = useState("20");
-  const [minRating, setMinRating] = useState("0");
+  const [maxResults, setMaxResults] = useState("25");
+  const [employeeRange, setEmployeeRange] = useState("any");
+  const [foundedBefore, setFoundedBefore] = useState("any");
   const [scanning, setScanning] = useState(false);
   const [results, setResults] = useState<ScanResult[]>([]);
   const [currentScanId, setCurrentScanId] = useState<string | null>(null);
@@ -200,14 +204,15 @@ export default function ScannerPage() {
           query: query.trim(),
           location: location.trim(),
           max_results: parseInt(maxResults),
-          min_rating: parseFloat(minRating) || undefined,
+          employee_ranges: employeeRange === "any" ? undefined : [employeeRange],
+          founded_before: foundedBefore === "any" ? undefined : parseInt(foundedBefore),
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
         if (data.setup_required) {
-          toast.error("Google Places API key not configured. Add GOOGLE_PLACES_API_KEY to your .env.local file.");
+          toast.error("Apollo API key not configured. Add APOLLO_API_KEY to your .env.local file.");
         } else {
           toast.error(data.error || "Scan failed");
         }
@@ -343,7 +348,7 @@ export default function ScannerPage() {
   ).length;
 
   // Show setup required message
-  if (apiStatus && !apiStatus.google_places_configured) {
+  if (apiStatus && !apiStatus.apollo_configured) {
     return (
       <div className="space-y-6">
         <div>
@@ -356,20 +361,21 @@ export default function ScannerPage() {
           <CardContent className="flex items-start gap-4 p-6">
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" />
             <div className="space-y-3">
-              <h3 className="font-semibold">Google Places API Key Required</h3>
+              <h3 className="font-semibold">Apollo API Key Required</h3>
               <p className="text-sm text-muted-foreground">
-                The scanner uses Google Places API to find businesses. Set up your API key to get started:
+                The scanner uses Apollo to find acquisition targets by industry, location,
+                and company size. Set up your API key to get started:
               </p>
               <ol className="list-decimal space-y-1 pl-4 text-sm text-muted-foreground">
-                <li>Go to <span className="font-mono text-xs">console.cloud.google.com</span></li>
-                <li>Create a project (or select existing)</li>
-                <li>Enable the <strong>Places API (New)</strong></li>
-                <li>Create an API key under Credentials</li>
-                <li>Add <span className="font-mono text-xs">GOOGLE_PLACES_API_KEY=your_key</span> to your <span className="font-mono text-xs">.env.local</span> file</li>
+                <li>Go to <span className="font-mono text-xs">app.apollo.io</span></li>
+                <li>Open <strong>Settings &rarr; Integrations &rarr; API</strong></li>
+                <li>Create an API key</li>
+                <li>Add <span className="font-mono text-xs">APOLLO_API_KEY=your_key</span> to your <span className="font-mono text-xs">.env.local</span> file</li>
                 <li>Restart the dev server</li>
               </ol>
               <p className="text-xs text-muted-foreground">
-                Google provides $200/month free credit (~5,000 searches).
+                The free plan covers company search. Revenue and founded-year filters are
+                paid features, so the scanner applies those locally after fetching.
               </p>
             </div>
           </CardContent>
@@ -385,7 +391,7 @@ export default function ScannerPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Business Scanner</h1>
           <p className="text-sm text-muted-foreground">
-            Find acquisition targets using Google Places, Hunter.io & Apollo.io
+            Find acquisition targets using Apollo, Hunter.io & website enrichment
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -426,14 +432,14 @@ export default function ScannerPage() {
             <div className="space-y-2">
               <Label>Location</Label>
               <Input
-                placeholder="e.g., Austin TX, Tampa FL, Denver CO"
+                placeholder="e.g., Austin, Texas, United States"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && startScan()}
               />
             </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-4">
             <div className="space-y-2">
               <Label>Max Results</Label>
               <Select value={maxResults} onValueChange={setMaxResults}>
@@ -442,22 +448,40 @@ export default function ScannerPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20 (default)</SelectItem>
+                  <SelectItem value="25">25 (default)</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Min Rating</Label>
-              <Select value={minRating} onValueChange={setMinRating}>
+              <Label>Company Size</Label>
+              <Select value={employeeRange} onValueChange={setEmployeeRange}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">Any</SelectItem>
-                  <SelectItem value="3">3.0+</SelectItem>
-                  <SelectItem value="3.5">3.5+</SelectItem>
-                  <SelectItem value="4">4.0+</SelectItem>
-                  <SelectItem value="4.5">4.5+</SelectItem>
+                  <SelectItem value="any">Any size</SelectItem>
+                  <SelectItem value="1,10">1&ndash;10 employees</SelectItem>
+                  <SelectItem value="11,20">11&ndash;20 employees</SelectItem>
+                  <SelectItem value="21,50">21&ndash;50 employees</SelectItem>
+                  <SelectItem value="51,100">51&ndash;100 employees</SelectItem>
+                  <SelectItem value="101,200">101&ndash;200 employees</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Founded Before</Label>
+              <Select value={foundedBefore} onValueChange={setFoundedBefore}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Any age</SelectItem>
+                  <SelectItem value="2010">2010 (15+ yrs)</SelectItem>
+                  <SelectItem value="2000">2000 (25+ yrs)</SelectItem>
+                  <SelectItem value="1990">1990 (35+ yrs)</SelectItem>
+                  <SelectItem value="1980">1980 (45+ yrs)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -596,22 +620,31 @@ export default function ScannerPage() {
                         <div>
                           <h3 className="text-sm font-medium">{result.business_name}</h3>
                           <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                            {bd.formatted_address && (
+                            {bd.founded_year && (
+                              <span
+                                className="flex items-center gap-1"
+                                title={`Founded ${bd.founded_year}`}
+                              >
+                                <CalendarClock className="h-3 w-3" />
+                                {bd.business_age} yrs old
+                              </span>
+                            )}
+                            {bd.revenue_printed && (
+                              <span className="flex items-center gap-1">
+                                <DollarSign className="h-3 w-3" />
+                                {bd.revenue_printed}
+                              </span>
+                            )}
+                            {bd.industry && (
                               <span className="flex items-center gap-1">
                                 <MapPin className="h-3 w-3" />
-                                {bd.formatted_address}
+                                {bd.industry}
                               </span>
                             )}
                             {(cd.phone || bd.phone) && (
                               <span className="flex items-center gap-1">
                                 <Phone className="h-3 w-3" />
                                 {cd.phone || bd.phone}
-                              </span>
-                            )}
-                            {bd.rating && (
-                              <span className="flex items-center gap-1">
-                                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                                {bd.rating} ({bd.review_count || 0})
                               </span>
                             )}
                             {bd.website && (
@@ -625,15 +658,15 @@ export default function ScannerPage() {
                                 Website
                               </a>
                             )}
-                            {bd.google_maps_url && (
+                            {bd.linkedin_url && (
                               <a
-                                href={bd.google_maps_url}
+                                href={bd.linkedin_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-1 text-primary hover:underline"
                               >
-                                <ExternalLink className="h-3 w-3" />
-                                Maps
+                                <Linkedin className="h-3 w-3" />
+                                LinkedIn
                               </a>
                             )}
                           </div>

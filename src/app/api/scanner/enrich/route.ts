@@ -3,19 +3,27 @@ import { createClient } from "@/lib/supabase/server";
 import { getAnthropicClient, AI_MODEL, parseAIJson } from "@/lib/ai/client";
 import { WEBSITE_CONTACT_EXTRACTION_PROMPT } from "@/lib/ai/prompts/scanner";
 import { scrapeWebsiteText } from "@/lib/scanner/website-scraper";
+import { z } from "zod";
+import { authenticateAndLimit, validateBody, handleApiError } from "@/lib/api-utils";
+import { RATE_LIMITS } from "@/lib/rate-limit";
+
+const EnrichSchema = z.object({
+  resultId: z.string().uuid(),
+});
 
 export const maxDuration = 30;
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await authenticateAndLimit(req, "scanner", RATE_LIMITS.scanner);
+    if (auth.error) return auth.error;
+
+    const raw = await req.json();
+    const validation = validateBody(raw, EnrichSchema);
+    if (validation.error) return validation.error;
+    const { resultId } = validation.data;
+
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-    const { resultId } = await req.json();
-    if (!resultId) return NextResponse.json({ error: "resultId is required" }, { status: 400 });
-
-    // API key check handled by getAnthropicClient() with .env.local fallback
 
     // Fetch the scan result (verify ownership via scan → user_id)
     const { data: result, error } = await supabase
@@ -32,7 +40,7 @@ export async function POST(req: NextRequest) {
       enrichment_data: Record<string, any> | null;
       scans: { user_id: string };
     };
-    if (resultWithJoin.scans.user_id !== user.id) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    if (resultWithJoin.scans.user_id !== auth.user.id) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
 
     const website = resultWithJoin.business_data?.website;
     if (!website) {
@@ -93,7 +101,7 @@ export async function POST(req: NextRequest) {
       .eq("id", resultId);
 
     return NextResponse.json({ contact_data: contactData });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return handleApiError(error, "Scanner.Enrich");
   }
 }

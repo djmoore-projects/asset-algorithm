@@ -55,10 +55,12 @@ export async function POST(req: NextRequest) {
 </Response>`;
   } else {
     // Default: simple connection
+    // Nothing should reach this branch: automated calling is disabled and
+    // prospect calls are dialed by a person. If a stray call lands here, end
+    // it immediately rather than leaving someone holding on silence.
     twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Matthew">Hello, this is a call from Asset Algorithm. Please hold while we connect you.</Say>
-  <Pause length="60"/>
+  <Hangup/>
 </Response>`;
   }
 
@@ -100,10 +102,12 @@ export async function GET(req: NextRequest) {
   </Dial>
 </Response>`;
   } else {
+    // Nothing should reach this branch: automated calling is disabled and
+    // prospect calls are dialed by a person. If a stray call lands here, end
+    // it immediately rather than leaving someone holding on silence.
     twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say voice="Polly.Matthew">Hello, this is a call from Asset Algorithm. Please hold while we connect you.</Say>
-  <Pause length="60"/>
+  <Hangup/>
 </Response>`;
   }
 

@@ -27,7 +27,9 @@ export function DealSelector({ onSelect, onClear, selectedDealId }: DealSelector
   }, []);
 
   useEffect(() => {
+    // Keep local selection in sync with the controlled selectedDealId prop.
     if (!selectedDealId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedDeal(null);
     } else {
       const deal = deals.find((d) => d.id === selectedDealId);

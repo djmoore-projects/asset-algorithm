@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Agentic loop with tool use
-    let currentMessages = [...conversationMessages];
+    const currentMessages = [...conversationMessages];
     let finalResponse = "";
     let iterations = 0;
     const maxIterations = 5;

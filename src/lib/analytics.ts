@@ -8,7 +8,7 @@ type AnalyticsEvent =
   | { event: "deal_created"; properties: { source?: string } }
   | { event: "company_imported"; properties: { count: number; source: string } }
   | { event: "campaign_launched"; properties: { channel_count: number; contact_count: number } }
-  | { event: "icp_configured"; properties: {} }
+  | { event: "icp_configured"; properties: Record<string, never> }
   | { event: "integration_connected"; properties: { provider: string } }
   | { event: "plan_upgraded"; properties: { from: string; to: string } };
 

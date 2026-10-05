@@ -48,11 +48,11 @@ function getFeatures(planId: "free" | "pro" | "enterprise"): string[] {
 export default function PricingPage() {
   async function handleSubscribe(planId: "free" | "pro" | "enterprise") {
     if (planId === "free") {
-      window.location.href = "/auth/signup";
+      window.location.assign("/auth/signup");
       return;
     }
     if (planId === "enterprise") {
-      window.location.href = "mailto:sales@aismartr.com";
+      window.location.assign("mailto:sales@aismartr.com");
       return;
     }
     // For pro, redirect to checkout
@@ -63,7 +63,7 @@ export default function PricingPage() {
       body: JSON.stringify({ price_id: priceId }),
     });
     const { url } = await res.json();
-    if (url) window.location.href = url;
+    if (url) window.location.assign(url);
   }
 
   return (

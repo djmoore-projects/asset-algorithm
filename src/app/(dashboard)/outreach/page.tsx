@@ -26,6 +26,8 @@ export default function OutreachPage() {
   }, []);
 
   useEffect(() => {
+    // Initial data load; fetchCampaigns sets loading state before awaiting.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchCampaigns();
   }, [fetchCampaigns]);
 

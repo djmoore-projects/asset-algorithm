@@ -31,7 +31,7 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Lint
-        run: npx next lint
+        run: npm run lint  # `next lint` was removed in Next.js 16
 
   # Confirms full-migration.sql still matches the real database. Separate job
   # because it needs credentials, and it should not block a PR from a fork.
